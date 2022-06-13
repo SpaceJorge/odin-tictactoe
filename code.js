@@ -14,6 +14,27 @@ while not allowing placing where its already been done
 */
 
 const board = ((player,boardIndex) => {
+    const visibleBoard = [];
+    const playedBoard = [];
+    let whosTurn = "X";
+    for (let i = 0; i<9 ;i++){
+        visibleBoard.push = "Touch Me";
+        playedBoard.push = false;
+    }
+
+    const startGame = ()=>{
+        whosTurn = "X";
+        for (let i = 0; i<9 ;i++){
+            visibleBoard[i] = "Touch Me";
+            playedBoard[i] = false;
+        }
+        addVisualBoard();
+    };
+
+    const makeMove = (player,boardIndex) =>{
+
+    };
+
 
     function addVisualBoard(){
         
@@ -24,6 +45,7 @@ const board = ((player,boardIndex) => {
         mainContainer.appendChild(gameContainer);
 
         const title = document.createElement("h1");
+        title.textContent = "Tic-Tac-Toe Battle Royale";
         title.classList.add("title");
         gameContainer.appendChild(title);
 
@@ -37,16 +59,50 @@ const board = ((player,boardIndex) => {
 
                 const pX = document.createElement("p");
                 pX.textContent = "X";
-                game.appendChild(pX);
+                turnX.appendChild(pX);
 
             const board = document.createElement("div");
             board.classList.add("board");
             game.appendChild(board);
 
                 for (let i = 0; i<9 ;i++){
-                    const spot = document.createElement("p");
+                    const spot = document.createElement("div");
                     spot.dataset.array = i;
-                    board.appendChild(spot)   
+                    spot.style.fontSize = "4rem";
+                    spot.style.color = "white";
+                    spot.style.fontWeight = "bold";
+                    //board button functionality
+                    spot.addEventListener("click", ()=>{
+                        if (playedBoard[spot.dataset.array] == false){
+                            playedBoard[spot.dataset.array] = true;
+                            visibleBoard[spot.dataset.array] = whosTurn;
+                            checkWinner();
+                            if (whosTurn == "X"){
+                                spot.textContent = "X";
+                                spot.style.backgroundColor = "red";
+                                whosTurn = "O";
+                            }else{
+                                spot.textContent = "O";
+                                spot.style.backgroundColor = "blue";
+                                whosTurn = "X";
+                            }
+                            
+                        }
+                    });
+                    spot.addEventListener("mouseover",()=>{
+                        if (playedBoard[spot.dataset.array] == false){
+                            spot.textContent = whosTurn;
+                            spot.style.backgroundColor = "mediumslateblue";
+                        }
+                    });
+                    spot.addEventListener("mouseout",()=>{
+                        if (playedBoard[spot.dataset.array] == false){
+                            spot.textContent = "";
+                            spot.style.backgroundColor = "aquamarine";
+                        }
+                    });
+
+                    board.appendChild(spot);
                 }
 
             const turnO = document.createElement("div");
@@ -55,13 +111,17 @@ const board = ((player,boardIndex) => {
 
                 const pO = document.createElement("p");
                 pO.textContent = "O";
-                game.appendChild(pO);
+                turnO.appendChild(pO);
         
         const state = document.createElement("h3");
+        state.textContent = "Click on the board to play";
         state.classList.add("state");
+        state.setAttribute("id","state");
         gameContainer.appendChild(state);
 
         const restart = document.createElement("button");
+        restart.textContent = "Restart Battle";
+        restart.classList.add("restart");
         gameContainer.appendChild(restart);
 
         /*
@@ -70,11 +130,11 @@ const board = ((player,boardIndex) => {
                 h1.title
                 div.game
                     div.turnX X with red background
-                        p
+                        div
                     div.board
                         grid
                     div.turnO 0 X with blue background
-                        p
+                        div
                 h3.gameState
                 button.restart
                 
@@ -90,28 +150,61 @@ const board = ((player,boardIndex) => {
         }
 
     };
-    const visibleBoard = [];
-    const playedBoard = [];
-    const startGame = ()=>{
-
-        if (visibleBoard.length !=0){
-            visibleBoard.splice(0,(visibleBoard.length-1));
-        }
-        if (playedBoard.length !=0){
-            visibleBoard.splice(0,(playedBoard.length-1));
-        }
+    
+    function checkWinner(){
+        let endGameFlag = true;
+        const congratulations = document.getElementById("state");
         
-        for (let i = 0; i<9 ;i++){
-            visibleBoard.push = "Touch Me";
-            playedBoard.push = 0;
+        for (let j = 0; j<9;j++){
+            if ((visibleBoard[j] == visibleBoard [j+1]) && (visibleBoard[j+1] == visibleBoard[j+2])){
+                if ((j == 0)||(j == 3) || (j==6)){ // Horizontals
+                    
+                    congratulations.textContent = `The winner is ${whosTurn}`;
+                    if (whosTurn == "X"){
+                        congratulations.style.color = "red";
+
+                    }else{
+                        congratulations.style.color = "blue";
+                    }
+                    return;
+                }
+            }
+            if ((visibleBoard[j] == visibleBoard [j+4]) && (visibleBoard[j+4] == visibleBoard[j+8])){
+                if (j == 0){ // left-top to right-bottom
+                    
+                    congratulations.textContent = (`The winner is ${whosTurn}`);
+                    return;
+                }
+            }
+            if ((visibleBoard[j] == visibleBoard [j+3]) && (visibleBoard[j+3] == visibleBoard[j+6])){
+                if ((j == 0)||(j == 1) || (j==2)){ // Verticals
+                    
+                    congratulations.textContent = (`The winner is ${whosTurn}`);
+                    return;
+                }
+            }
+            if ((visibleBoard[j] == visibleBoard [j+2]) && (visibleBoard[j+2] == visibleBoard[j+4])){
+                if (j == 2){ // right-top to left-bottom
+                    
+                    congratulations.textContent = (`The winner is ${whosTurn}`);
+                    return;
+                }
+            }
+            
+            
+            if (playedBoard[j] == false){
+                endGameFlag = false;
+            }
         }
 
-        addVisualBoard();
-    };
+        if (endGameFlag == true){
+            
+            state.textContent = `The winner is friendship, cos you tied, try harder!`;
+        }
+    
+        
+    }
 
-    const makeMove = (player,boardIndex) =>{
-
-    };
 
     return{
         visibleBoard,
@@ -133,3 +226,4 @@ const playerFactory = (name,symbol) =>{
 /*const playerOne = playerFactory(name, "X");*/
 
 board.startGame();
+

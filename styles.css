@@ -1,0 +1,46 @@
+:root{
+    box-sizing: border-box;
+
+}
+
+.gameContainer{
+    display: flex;
+    align-items: center;
+
+    justify-content: center;
+    flex-direction: column;
+}
+
+.game{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-around;
+}
+.turn{
+    font-size: 4rem;
+    padding: 4rem;
+}
+.board{
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: 1fr 1fr 1fr;
+    gap: 0.5rem;
+    
+}
+.board div{
+    height: 4rem;
+    width: 4rem;
+    background-color: aquamarine;
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+    transition: 0.5s;
+}
+/*
+.over{
+    background-color: mediumslateblue;
+}
+*/
