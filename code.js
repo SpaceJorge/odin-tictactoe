@@ -16,6 +16,7 @@ while not allowing placing where its already been done
 const board = ((player,boardIndex) => {
     const visibleBoard = [];
     const playedBoard = [];
+    const gameWinCount = [];
     let whosTurn = "X";
     for (let i = 0; i<9 ;i++){
         visibleBoard.push = "Touch Me";
@@ -29,10 +30,6 @@ const board = ((player,boardIndex) => {
             playedBoard[i] = false;
         }
         addVisualBoard();
-    };
-
-    const makeMove = (player,boardIndex) =>{
-
     };
 
 
@@ -51,6 +48,7 @@ const board = ((player,boardIndex) => {
 
         const game = document.createElement("div");
         game.classList.add("game");
+        game.setAttribute("id", "gameContainer");
         gameContainer.appendChild(game);
 
             const turnX = document.createElement("div");
@@ -67,11 +65,24 @@ const board = ((player,boardIndex) => {
 
                 for (let i = 0; i<9 ;i++){
                     const spot = document.createElement("div");
+                    spot.classList.add("spot");
                     spot.dataset.array = i;
                     spot.style.fontSize = "4rem";
                     spot.style.color = "white";
                     spot.style.fontWeight = "bold";
                     //board button functionality
+                    spot.addEventListener("mouseover",()=>{
+                        if (playedBoard[spot.dataset.array] == false){
+                            spot.textContent = whosTurn;
+                            spot.style.backgroundColor = "mediumslateblue";
+                        }
+                    });
+                    spot.addEventListener("mouseout",()=>{
+                        if (playedBoard[spot.dataset.array] == false){
+                            spot.textContent = "";
+                            spot.style.backgroundColor = "aquamarine";
+                        }
+                    });
                     spot.addEventListener("click", ()=>{
                         if (playedBoard[spot.dataset.array] == false){
                             playedBoard[spot.dataset.array] = true;
@@ -89,18 +100,7 @@ const board = ((player,boardIndex) => {
                             
                         }
                     });
-                    spot.addEventListener("mouseover",()=>{
-                        if (playedBoard[spot.dataset.array] == false){
-                            spot.textContent = whosTurn;
-                            spot.style.backgroundColor = "mediumslateblue";
-                        }
-                    });
-                    spot.addEventListener("mouseout",()=>{
-                        if (playedBoard[spot.dataset.array] == false){
-                            spot.textContent = "";
-                            spot.style.backgroundColor = "aquamarine";
-                        }
-                    });
+
 
                     board.appendChild(spot);
                 }
@@ -122,6 +122,11 @@ const board = ((player,boardIndex) => {
         const restart = document.createElement("button");
         restart.textContent = "Restart Battle";
         restart.classList.add("restart");
+        restart.addEventListener("click", ()=>{
+            cleanBoard();
+            startGame();
+        });
+        
         gameContainer.appendChild(restart);
 
         /*
@@ -142,55 +147,86 @@ const board = ((player,boardIndex) => {
         */
     };
 
-    function removeVisualBoard(){
-        const mainContainer = document.getElementById("main");
-        const gameContainer = document.getElementsByClassName("gameContainer");
-        if (gameContainer != null){
-            mainContainer.removeChild(gameContainer);
-        }
-
-    };
     
+    function cleanBoard(){
+        const spotList = [...document.getElementsByClassName("spot")];
+        spotList.forEach((spot)=>{
+            spot.textContent = "";
+            spot.style.backgroundColor = "aquamarine";
+        });
+        const state = document.getElementById("state");
+        state.textContent = "Click on the board to play";
+    };
+    function endGameState(winner){
+        const congratulations = document.getElementById("state");
+        if (winner != "None"){
+            congratulations.textContent = `The winner is ${whosTurn}`;
+            if (whosTurn == "X"){
+                congratulations.style.color = "red";
+            }else{
+                congratulations.style.color = "blue";
+            }
+            gameWinCount.push = whosTurn;
+        }else{
+            congratulations.textContent = `The winner is friendship, cos you tied, try harder!`;
+            gameWinCount.push = "None";
+        }
+        const spotList = [...document.getElementsByClassName("spot")];
+        for (let j = 0; j<9; j++){
+            if (playedBoard[j] == false){
+                spotList[j].style.backgroundColor = "grey";
+                spotList[j].textContent = "-";
+                playedBoard[j] = true;
+            }
+        }
+    }
     function checkWinner(){
         let endGameFlag = true;
         const congratulations = document.getElementById("state");
         
         for (let j = 0; j<9;j++){
-            if ((visibleBoard[j] == visibleBoard [j+1]) && (visibleBoard[j+1] == visibleBoard[j+2])){
-                if ((j == 0)||(j == 3) || (j==6)){ // Horizontals
-                    
-                    congratulations.textContent = `The winner is ${whosTurn}`;
-                    if (whosTurn == "X"){
-                        congratulations.style.color = "red";
+            if (visibleBoard[j] != "Touch Me"){
 
-                    }else{
-                        congratulations.style.color = "blue";
+                if ((visibleBoard[j] == visibleBoard [j+1]) && (visibleBoard[j+1] == visibleBoard[j+2])){
+                    if ((j == 0)||(j == 3)||(j==6)){ // Horizontals
+                        /*
+                        congratulations.textContent = `The winner is ${whosTurn}`;
+                        
+                        if (whosTurn == "X"){
+                            congratulations.style.color = "red";
+
+                        }else{
+                            congratulations.style.color = "blue";
+                        }*/
+                        endGameState(whosTurn);
+                        return;
                     }
-                    return;
+                }
+                if ((visibleBoard[j] == visibleBoard [j+4]) && (visibleBoard[j+4] == visibleBoard[j+8])){
+                    if (j == 0){ // left-top to right-bottom
+                        
+                        /*congratulations.textContent = (`The winner is ${whosTurn}`);*/
+                        endGameState(whosTurn);
+                        return;
+                    }
+                }
+                if ((visibleBoard[j] == visibleBoard [j+3]) && (visibleBoard[j+3] == visibleBoard[j+6])){
+                    if ((j == 0)||(j == 1) || (j==2)){ // Verticals
+                        
+                        /*congratulations.textContent = (`The winner is ${whosTurn}`);*/
+                        endGameState(whosTurn);
+                        return;
+                    }
+                }
+                if ((visibleBoard[j] == visibleBoard [j+2]) && (visibleBoard[j+2] == visibleBoard[j+4])){
+                    if (j == 2){ // right-top to left-bottom
+                        
+                        /*congratulations.textContent = (`The winner is ${whosTurn}`);*/
+                        endGameState(whosTurn);
+                        return;
+                    }
                 }
             }
-            if ((visibleBoard[j] == visibleBoard [j+4]) && (visibleBoard[j+4] == visibleBoard[j+8])){
-                if (j == 0){ // left-top to right-bottom
-                    
-                    congratulations.textContent = (`The winner is ${whosTurn}`);
-                    return;
-                }
-            }
-            if ((visibleBoard[j] == visibleBoard [j+3]) && (visibleBoard[j+3] == visibleBoard[j+6])){
-                if ((j == 0)||(j == 1) || (j==2)){ // Verticals
-                    
-                    congratulations.textContent = (`The winner is ${whosTurn}`);
-                    return;
-                }
-            }
-            if ((visibleBoard[j] == visibleBoard [j+2]) && (visibleBoard[j+2] == visibleBoard[j+4])){
-                if (j == 2){ // right-top to left-bottom
-                    
-                    congratulations.textContent = (`The winner is ${whosTurn}`);
-                    return;
-                }
-            }
-            
             
             if (playedBoard[j] == false){
                 endGameFlag = false;
@@ -199,12 +235,12 @@ const board = ((player,boardIndex) => {
 
         if (endGameFlag == true){
             
-            state.textContent = `The winner is friendship, cos you tied, try harder!`;
+            /*state.textContent = `The winner is friendship, cos you tied, try harder!`;*/
+            endGameState("None");
         }
     
         
     }
-
 
     return{
         visibleBoard,
