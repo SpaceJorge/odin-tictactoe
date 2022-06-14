@@ -17,6 +17,7 @@ const board = ((player,boardIndex) => {
     const visibleBoard = [];
     const playedBoard = [];
     const gameWinCount = [];
+    let boardActive = false;
     let whosTurn = "X";
     for (let i = 0; i<9 ;i++){
         visibleBoard.push = "Touch Me";
@@ -29,7 +30,11 @@ const board = ((player,boardIndex) => {
             visibleBoard[i] = "Touch Me";
             playedBoard[i] = false;
         }
-        addVisualBoard();
+        if (boardActive == false){
+            addVisualBoard();
+            boardActive = true;
+        }
+        
     };
 
 
@@ -156,6 +161,7 @@ const board = ((player,boardIndex) => {
         });
         const state = document.getElementById("state");
         state.textContent = "Click on the board to play";
+        state.style.color = "black";
     };
     function endGameState(winner){
         const congratulations = document.getElementById("state");
