@@ -58,6 +58,7 @@ const board = ((player,boardIndex) => {
 
             const turnX = document.createElement("div");
             turnX.classList.add("turn");
+            turnX.classList.add("mine");
             game.appendChild(turnX);
 
                 const pX = document.createElement("p");
@@ -92,17 +93,21 @@ const board = ((player,boardIndex) => {
                         if (playedBoard[spot.dataset.array] == false){
                             playedBoard[spot.dataset.array] = true;
                             visibleBoard[spot.dataset.array] = whosTurn;
-                            checkWinner();
+                            let end = checkWinner();
                             if (whosTurn == "X"){
                                 spot.textContent = "X";
                                 spot.style.backgroundColor = "red";
                                 whosTurn = "O";
+                                
                             }else{
                                 spot.textContent = "O";
                                 spot.style.backgroundColor = "blue";
                                 whosTurn = "X";
                             }
-                            
+                            if (end != true) {
+                                turnX.classList.toggle("mine");
+                                turnO.classList.toggle("mine");
+                            }
                         }
                     });
 
@@ -162,6 +167,12 @@ const board = ((player,boardIndex) => {
         const state = document.getElementById("state");
         state.textContent = "Click on the board to play";
         state.style.color = "black";
+        const turns = [...document.getElementsByClassName("turn")];
+        if (turns[0].classList != "turn mine"){
+            turns[0].classList.toggle("mine");
+            turns[1].classList.toggle("mine");
+        }
+
     };
     function endGameState(winner){
         const congratulations = document.getElementById("state");
@@ -205,7 +216,7 @@ const board = ((player,boardIndex) => {
                             congratulations.style.color = "blue";
                         }*/
                         endGameState(whosTurn);
-                        return;
+                        return true;
                     }
                 }
                 if ((visibleBoard[j] == visibleBoard [j+4]) && (visibleBoard[j+4] == visibleBoard[j+8])){
@@ -213,7 +224,7 @@ const board = ((player,boardIndex) => {
                         
                         /*congratulations.textContent = (`The winner is ${whosTurn}`);*/
                         endGameState(whosTurn);
-                        return;
+                        return true;
                     }
                 }
                 if ((visibleBoard[j] == visibleBoard [j+3]) && (visibleBoard[j+3] == visibleBoard[j+6])){
@@ -221,7 +232,7 @@ const board = ((player,boardIndex) => {
                         
                         /*congratulations.textContent = (`The winner is ${whosTurn}`);*/
                         endGameState(whosTurn);
-                        return;
+                        return true;
                     }
                 }
                 if ((visibleBoard[j] == visibleBoard [j+2]) && (visibleBoard[j+2] == visibleBoard[j+4])){
@@ -229,7 +240,7 @@ const board = ((player,boardIndex) => {
                         
                         /*congratulations.textContent = (`The winner is ${whosTurn}`);*/
                         endGameState(whosTurn);
-                        return;
+                        return true;
                     }
                 }
             }
@@ -243,6 +254,7 @@ const board = ((player,boardIndex) => {
             
             /*state.textContent = `The winner is friendship, cos you tied, try harder!`;*/
             endGameState("None");
+            return true;
         }
     
         
