@@ -47,7 +47,7 @@ const board = ((player,boardIndex) => {
         mainContainer.appendChild(gameContainer);
 
         const title = document.createElement("h1");
-        title.textContent = "Tic-Tac-Toe Battle Royale";
+        title.textContent = "Tic-Tac-Toe Couch Battle Royale";
         title.classList.add("title");
         gameContainer.appendChild(title);
 
