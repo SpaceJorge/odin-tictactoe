@@ -188,7 +188,7 @@ const board = ((player,boardIndex) => {
             modeLocal.classList.add("local");
             modeLocal.disabled = true;
             modeLocal.addEventListener("click", ()=>{
-                againstIA == "local";
+                againstIA = "local";
                 
                 cleanBoard();
                 startGame();
@@ -204,8 +204,9 @@ const board = ((player,boardIndex) => {
             modeRandom.textContent = "Easy AI Mode";
             modeRandom.classList.add("mode");
             modeRandom.classList.add("easy");
+            modeRandom.disabled = false;
             modeRandom.addEventListener("click", ()=>{
-                againstIA == "random";
+                againstIA = "random";
                 
                 cleanBoard();
                 startGame();
@@ -220,8 +221,9 @@ const board = ((player,boardIndex) => {
             modeUnbeatable.textContent = "Unbeatable AI Mode";
             modeUnbeatable.classList.add("mode");
             modeUnbeatable.classList.add("unbeatable");
+            modeUnbeatable.disabled = false;
             modeUnbeatable.addEventListener("click", ()=>{
-                againstIA == "unbeatable";
+                againstIA = "unbeatable";
                 
                 cleanBoard();
                 startGame();
