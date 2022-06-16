@@ -65,6 +65,14 @@ const board = ((player,boardIndex) => {
                 pX.textContent = "X";
                 turnX.appendChild(pX);
 
+                const nameX = document.createElement("input");
+                nameX.placeholder = "George";
+                nameX.id = "nameX";
+                nameX.name = "nameX";
+                nameX.type="text";
+                nameX.style.borderColor = "#f95353";
+                turnX.appendChild(nameX);
+
             const board = document.createElement("div");
             board.classList.add("board");
             game.appendChild(board);
@@ -122,7 +130,15 @@ const board = ((player,boardIndex) => {
                 const pO = document.createElement("p");
                 pO.textContent = "O";
                 turnO.appendChild(pO);
-        
+
+                const nameO = document.createElement("input");
+                nameO.placeholder = "Shorsh";
+                nameO.id = "nameO";
+                nameO.name = "nameO";
+                nameO.type="text";
+                nameO.style.borderColor = "#5c5cff";
+                turnO.appendChild(nameO);
+
         const state = document.createElement("h3");
         state.textContent = "Click on the board to play";
         state.classList.add("state");
@@ -166,7 +182,7 @@ const board = ((player,boardIndex) => {
         });
         const state = document.getElementById("state");
         state.textContent = "Click on the board to play";
-        state.style.color = "black";
+        state.style.backgroundColor = "rgb(0 20 255 / 0%)";
         const turns = [...document.getElementsByClassName("turn")];
         if (turns[0].classList != "turn mine"){
             turns[0].classList.toggle("mine");
@@ -175,17 +191,32 @@ const board = ((player,boardIndex) => {
 
     };
     function endGameState(winner){
+        const names = [...document.getElementsByTagName("input")];
+        let nameX = "";
+        let nameO = "";
+        if (names[0].getAttribute("placeholder") && names[0].value == ""){
+            nameX="The Unnamed X Champion";
+        }else{
+            nameX = names[0].value;
+        }
+        if (names[1].getAttribute("placeholder") && names[1].value == ""){
+            nameO="The Unnamed Y Champion";
+        }else{
+            nameO = names[1].value;
+        }
         const congratulations = document.getElementById("state");
         if (winner != "None"){
-            congratulations.textContent = `The winner is ${whosTurn}`;
+            
             if (whosTurn == "X"){
-                congratulations.style.color = "red";
+                congratulations.style.backgroundColor = "#ff000052";
+                congratulations.textContent = `The winner is ${nameX}`;
             }else{
-                congratulations.style.color = "blue";
+                congratulations.style.backgroundColor = "#0014ff52";
+                congratulations.textContent = `The winner is ${nameO}`;
             }
             gameWinCount.push = whosTurn;
         }else{
-            congratulations.textContent = `The winner is friendship, cos you tied, try harder!`;
+            congratulations.textContent = `The true winner today is friendship, cos you tied, try harder!`;
             gameWinCount.push = "None";
         }
         const spotList = [...document.getElementsByClassName("spot")];
