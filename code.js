@@ -19,6 +19,7 @@ const board = ((player,boardIndex) => {
     const gameWinCount = [];
     let boardActive = false;
     let whosTurn = "X";
+    let againstIA = "local";
     for (let i = 0; i<9 ;i++){
         visibleBoard.push = "Touch Me";
         playedBoard.push = false;
@@ -115,7 +116,30 @@ const board = ((player,boardIndex) => {
                             if (end != true) {
                                 turnX.classList.toggle("mine");
                                 turnO.classList.toggle("mine");
+
+                                //IA Mode Extention
+                                
+                                if (againstIA == "random"){
+                                    
+                                    end = moveRandomAI();
+                                    
+                                    if (end != true) {
+                                        turnX.classList.toggle("mine");
+                                        turnO.classList.toggle("mine");
+                                    }
+
+                                }else if (againstIA == "unbeatable"){
+                                    //unbeatable code
+                                    end = moveUnbeatableAI();
+                                    
+                                    if (end != true) {
+                                        turnX.classList.toggle("mine");
+                                        turnO.classList.toggle("mine");
+                                    }
+                                }
+                                
                             }
+                            
                         }
                     });
 
@@ -152,28 +176,97 @@ const board = ((player,boardIndex) => {
             cleanBoard();
             startGame();
         });
-        
         gameContainer.appendChild(restart);
 
-        /*
-        div.main
-            div.gameContainer
-                h1.title
-                div.game
-                    div.turnX X with red background
-                        div
-                    div.board
-                        grid
-                    div.turnO 0 X with blue background
-                        div
-                h3.gameState
-                button.restart
-                
-                
-        */
-    };
+        const modeContainer = document.createElement("div");
+        modeContainer.classList.add("modeContainer");
+        gameContainer.appendChild(modeContainer);
 
+            const modeLocal = document.createElement("button");
+            modeLocal.textContent = "Local Mode";
+            modeLocal.classList.add("mode");
+            modeLocal.classList.add("local");
+            modeLocal.disabled = true;
+            modeLocal.addEventListener("click", ()=>{
+                againstIA == "local";
+                
+                cleanBoard();
+                startGame();
+                
+
+                modeLocal.disabled = true;
+                modeRandom.disabled = false;
+                modeUnbeatable.disabled = false;
+            });
+            modeContainer.appendChild(modeLocal);    
+
+            const modeRandom = document.createElement("button");
+            modeRandom.textContent = "Easy AI Mode";
+            modeRandom.classList.add("mode");
+            modeRandom.classList.add("easy");
+            modeRandom.addEventListener("click", ()=>{
+                againstIA == "random";
+                
+                cleanBoard();
+                startGame();
+                
+                modeLocal.disabled = false;
+                modeRandom.disabled = true;
+                modeUnbeatable.disabled = false;
+            });
+            modeContainer.appendChild(modeRandom);
+        
+            const modeUnbeatable = document.createElement("button");
+            modeUnbeatable.textContent = "Unbeatable AI Mode";
+            modeUnbeatable.classList.add("mode");
+            modeUnbeatable.classList.add("unbeatable");
+            modeUnbeatable.addEventListener("click", ()=>{
+                againstIA == "unbeatable";
+                
+                cleanBoard();
+                startGame();
+                
+                modeLocal.disabled = false;
+                modeRandom.disabled = false;
+                modeUnbeatable.disabled = true;
+            });
+            modeContainer.appendChild(modeUnbeatable);
+
+    };
+    function moveRandomAI(){
+        whosTurn = "O";
+        let selectedPlay = 0;
+        do {
+            selectedPlay = Math.floor((Math.random())*9);
+            
+        } while (visibleBoard[selectedPlay] != "Touch Me");
+        playedBoard[selectedPlay] = true;
+        visibleBoard[selectedPlay] = whosTurn;
+        end = checkWinner();
+        const boardSpots = [...document.getElementsByClassName("spot")];
+        boardSpots[selectedPlay].textContent = "O";
+        boardSpots[selectedPlay].style.backgroundColor = "blue";
+        whosTurn = "X";
+        return end;
+    }
     
+    function moveUnbeatableAI(){
+        whosTurn = "O";
+        let selectedPlay = 0;
+        do {
+            selectedPlay = Math.floor((Math.random())*9);
+            
+        } while (visibleBoard[selectedPlay] != "Touch Me");
+        playedBoard[selectedPlay] = true;
+        visibleBoard[selectedPlay] = whosTurn;
+        end = checkWinner();
+        const boardSpots = [...document.getElementsByClassName("spot")];
+        boardSpots[selectedPlay].textContent = "O";
+        boardSpots[selectedPlay].style.backgroundColor = "blue";
+        whosTurn = "X";
+        return end;
+    }
+
     function cleanBoard(){
         const spotList = [...document.getElementsByClassName("spot")];
         spotList.forEach((spot)=>{
@@ -195,12 +288,18 @@ const board = ((player,boardIndex) => {
         let nameX = "";
         let nameO = "";
         if (names[0].getAttribute("placeholder") && names[0].value == ""){
-            nameX="The Unnamed X Champion";
+            nameX="The X Fighter";
         }else{
             nameX = names[0].value;
         }
         if (names[1].getAttribute("placeholder") && names[1].value == ""){
-            nameO="The Unnamed Y Champion";
+            if (againstIA == "random") {
+                nameO="The Easy AI";
+            }else if(againstIA == "unbeatable"){
+                nameO="The Unbeatable AI! Don't be sad, as it was foretold in it's name.";
+            }else{
+                nameO="The O Fighter";
+            }
         }else{
             nameO = names[1].value;
         }
