@@ -106,21 +106,30 @@ const board = ((player,boardIndex) => {
                             if (whosTurn == "X"){
                                 spot.textContent = "X";
                                 spot.style.backgroundColor = "red";
-                                whosTurn = "O";
+                                if (end != "Playing"){
+                                    endGameState(end);
+                                }else{
+                                    whosTurn = "O";
+                                }
                                 
                             }else{
                                 spot.textContent = "O";
                                 spot.style.backgroundColor = "blue";
-                                whosTurn = "X";
+                                if (end != "Playing"){
+                                    endGameState(end);
+                                }else{
+                                    whosTurn = "X";
+                                }
+                                
                             }
                             if (end == "Playing") {
                                 turnX.classList.toggle("mine");
                                 turnO.classList.toggle("mine");
-                                whosTurn = "O";
+                                
                                 //IA Mode Extention
                                 
                                 if (againstIA == "random"){
-                                    
+                                    whosTurn = "O";
                                     end = moveRandomAI();
                                     
                                     if (end == "Playing") {
@@ -133,6 +142,7 @@ const board = ((player,boardIndex) => {
 
                                 }else if (againstIA == "unbeatable"){
                                     //unbeatable code
+                                    whosTurn = "O";
                                     end = moveUnbeatableAI();
                                     
                                     if (end == "Playing") {
@@ -144,9 +154,9 @@ const board = ((player,boardIndex) => {
                                     }
                                 }
                                 
-                            }else{
-                                endGameState(end);
                             }
+                                
+                        
                             
                         }
                     });
