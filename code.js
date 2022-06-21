@@ -113,31 +113,39 @@ const board = ((player,boardIndex) => {
                                 spot.style.backgroundColor = "blue";
                                 whosTurn = "X";
                             }
-                            if (end != true) {
+                            if (end == "Playing") {
                                 turnX.classList.toggle("mine");
                                 turnO.classList.toggle("mine");
-
+                                whosTurn = "O";
                                 //IA Mode Extention
                                 
                                 if (againstIA == "random"){
                                     
                                     end = moveRandomAI();
                                     
-                                    if (end != true) {
+                                    if (end == "Playing") {
                                         turnX.classList.toggle("mine");
                                         turnO.classList.toggle("mine");
+                                        whosTurn = "X";
+                                    }else{
+                                        endGameState(end);
                                     }
 
                                 }else if (againstIA == "unbeatable"){
                                     //unbeatable code
                                     end = moveUnbeatableAI();
                                     
-                                    if (end != true) {
+                                    if (end == "Playing") {
                                         turnX.classList.toggle("mine");
                                         turnO.classList.toggle("mine");
+                                        whosTurn = "X";
+                                    }else{
+                                        endGameState(end);
                                     }
                                 }
                                 
+                            }else{
+                                endGameState(end);
                             }
                             
                         }
@@ -193,7 +201,7 @@ const board = ((player,boardIndex) => {
                 cleanBoard();
                 startGame();
                 
-
+                
                 modeLocal.disabled = true;
                 modeRandom.disabled = false;
                 modeUnbeatable.disabled = false;
@@ -248,26 +256,106 @@ const board = ((player,boardIndex) => {
         const boardSpots = [...document.getElementsByClassName("spot")];
         boardSpots[selectedPlay].textContent = "O";
         boardSpots[selectedPlay].style.backgroundColor = "blue";
-        whosTurn = "X";
+        
         return end;
     }
     
     function moveUnbeatableAI(){
-        whosTurn = "O";
-        let selectedPlay = 0;
-        do {
-            selectedPlay = Math.floor((Math.random())*9);
-            
-        } while (visibleBoard[selectedPlay] != "Touch Me");
-        playedBoard[selectedPlay] = true;
-        visibleBoard[selectedPlay] = whosTurn;
+        //AI to make its turn
+        let bestScore = -Infinity;
+        let chosenMove;
+
+        for (let j = 0; j<9; j++){
+            // Is the spot available?
+            if (playedBoard[j] == false){
+                playedBoard[j] = true;
+                visibleBoard[j] = "O";
+                whosTurn = "O";
+                let score = minimax(visibleBoard,playedBoard, 0, false); 
+                /*minimax checks the score of this supposed next play, and then we 
+                compare it with other plays, choosing the best. 
+                Also, the next spot is NOT the maximizing player. So X in this case.
+                And this move is the 0 depth node for recursion purposes.*/
+                playedBoard[j] = false;
+                visibleBoard[j] = "Touch Me";
+                if (score > bestScore){
+                    bestScore = score;
+                    chosenMove = j;
+
+                }
+            }
+        }
+        //Once the best move is chosen, it is applied:
+        playedBoard[chosenMove]= true;
+        visibleBoard[chosenMove] = "O";
         end = checkWinner();
+        whosTurn = "O";
         const boardSpots = [...document.getElementsByClassName("spot")];
-        boardSpots[selectedPlay].textContent = "O";
-        boardSpots[selectedPlay].style.backgroundColor = "blue";
-        whosTurn = "X";
+        boardSpots[chosenMove].textContent = "O";
+        boardSpots[chosenMove].style.backgroundColor = "blue";
         return end;
     }
+    let scores = {
+        X: -10,
+        O: +10,
+        Tie: 0,
+        //Playing:0
+
+    }
+    function minimax(visibleBoard,playedBoard, depth, isMaximizing){
+        //help building this from https://www.youtube.com/watch?v=trKjYdBASyQ&ab_channel=TheCodingTrain
+        //be careful, he is solving for winning X, and here AI is O
+        let result = checkWinner();
+        if (result != "Playing"){
+            return scores[result];
+            
+        }
+
+        if (isMaximizing){
+            //AI player
+            let bestScore = -Infinity;
+        
+            for (let j = 0; j<9; j++){
+                 // Is the spot available?
+                if (playedBoard[j] == false){
+                    playedBoard[j] = true;
+                    visibleBoard[j] = "O";
+                    whosTurn= "O";
+                    let score = minimax( visibleBoard, playedBoard, depth+1, false);
+                    playedBoard[j] = false;
+                    visibleBoard[j] = "Touch Me";
+                    if (score > bestScore){
+                        bestScore = score;
+                    }
+                    
+                    
+
+                }
+            }
+            return bestScore;
+        }else{
+            //human player
+            let bestScore = Infinity;
+        
+            for (let j = 0; j<9; j++){
+                 // Is the spot available?
+                if (playedBoard[j] == false){
+                    playedBoard[j] = true;
+                    visibleBoard[j] = "X";
+                    whosTurn = "X";
+                    let score = minimax(visibleBoard,playedBoard, depth+1, true); //after the m
+                    playedBoard[j] = false;
+                    visibleBoard[j] = "Touch Me";
+                    
+                    if (score < bestScore){
+                        bestScore = score;
+                    }
+                }
+            }
+            return bestScore;
+        }
+    }
+
 
     function cleanBoard(){
         const spotList = [...document.getElementsByClassName("spot")];
@@ -306,7 +394,7 @@ const board = ((player,boardIndex) => {
             nameO = names[1].value;
         }
         const congratulations = document.getElementById("state");
-        if (winner != "None"){
+        if (winner != "Tie"){
             
             if (whosTurn == "X"){
                 congratulations.style.backgroundColor = "#ff000052";
@@ -318,7 +406,7 @@ const board = ((player,boardIndex) => {
             gameWinCount.push = whosTurn;
         }else{
             congratulations.textContent = `The true winner today is friendship, cos you tied, try harder!`;
-            gameWinCount.push = "None";
+            gameWinCount.push = "Tie";
         }
         const spotList = [...document.getElementsByClassName("spot")];
         for (let j = 0; j<9; j++){
@@ -338,41 +426,30 @@ const board = ((player,boardIndex) => {
 
                 if ((visibleBoard[j] == visibleBoard [j+1]) && (visibleBoard[j+1] == visibleBoard[j+2])){
                     if ((j == 0)||(j == 3)||(j==6)){ // Horizontals
-                        /*
-                        congratulations.textContent = `The winner is ${whosTurn}`;
-                        
-                        if (whosTurn == "X"){
-                            congratulations.style.color = "red";
 
-                        }else{
-                            congratulations.style.color = "blue";
-                        }*/
-                        endGameState(whosTurn);
-                        return true;
+                        //endGameState(whosTurn);
+                        return whosTurn;
                     }
                 }
                 if ((visibleBoard[j] == visibleBoard [j+4]) && (visibleBoard[j+4] == visibleBoard[j+8])){
                     if (j == 0){ // left-top to right-bottom
-                        
-                        /*congratulations.textContent = (`The winner is ${whosTurn}`);*/
-                        endGameState(whosTurn);
-                        return true;
+                                                
+                        //endGameState(whosTurn);
+                        return whosTurn;
                     }
                 }
                 if ((visibleBoard[j] == visibleBoard [j+3]) && (visibleBoard[j+3] == visibleBoard[j+6])){
                     if ((j == 0)||(j == 1) || (j==2)){ // Verticals
-                        
-                        /*congratulations.textContent = (`The winner is ${whosTurn}`);*/
-                        endGameState(whosTurn);
-                        return true;
+                                            
+                        //endGameState(whosTurn);
+                        return whosTurn;
                     }
                 }
                 if ((visibleBoard[j] == visibleBoard [j+2]) && (visibleBoard[j+2] == visibleBoard[j+4])){
                     if (j == 2){ // right-top to left-bottom
-                        
-                        /*congratulations.textContent = (`The winner is ${whosTurn}`);*/
-                        endGameState(whosTurn);
-                        return true;
+                                                
+                        //endGameState(whosTurn);
+                        return whosTurn;
                     }
                 }
             }
@@ -383,13 +460,12 @@ const board = ((player,boardIndex) => {
         }
 
         if (endGameFlag == true){
-            
-            /*state.textContent = `The winner is friendship, cos you tied, try harder!`;*/
-            endGameState("None");
-            return true;
+                    
+            //endGameState("Tie");
+            return "Tie";
         }
     
-        
+        return "Playing";
     }
 
     return{
